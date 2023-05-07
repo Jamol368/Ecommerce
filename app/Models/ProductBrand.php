@@ -19,6 +19,11 @@ class ProductBrand extends Model
         'slug'
     ];
 
+    /**
+     * The products that belong to the product brand.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
     public function products()
     {
         return $this->hasMany(Product::class);

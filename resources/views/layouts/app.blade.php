@@ -1,5 +1,4 @@
 <!DOCTYPE html>
-{{--<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">--}}
     <head>
         <meta charset="utf-8">
         <meta name="description" content="Ashion Template">
@@ -7,7 +6,6 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <meta http-equiv="X-UA-Compatible" content="ie=edge">
         <title>Ashion | Template</title>
-{{--        <meta name="csrf-token" content="{{ csrf_token() }}">--}}
 
         <title>{{ config('app.name', 'Laravel') }}</title>
 
@@ -78,11 +76,9 @@
                             <ul>
                                 <li class="active"><a href="{{ route('home') }}">Home</a></li>
 
-{{--                                @if(isset($contents))--}}
                                 @foreach($contents as $content)
                                 <li><a href="{{ route('category-view', ['id' => $content->id]) }}">{{ $content->name }}</a></li>
                                 @endforeach
-{{--                                @endif--}}
                             </ul>
                         </nav>
                     </div>
@@ -344,8 +340,10 @@
         <div class="search-model">
             <div class="h-100 d-flex align-items-center justify-content-center">
                 <div class="search-close-switch">+</div>
-                <form class="search-model-form" action="{{ route('search') }}" method="get">
-                    <input type="text" id="search-input" name="search" placeholder="Search here.....">
+                <form class="search-model-form" action="{{ route('search') }}" method="post">
+                    @method('POST')
+                    @csrf
+                    <input name="search" placeholder="Search here.....">
                 </form>
             </div>
         </div>

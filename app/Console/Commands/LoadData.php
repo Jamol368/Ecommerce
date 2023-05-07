@@ -3,12 +3,13 @@
 namespace App\Console\Commands;
 
 use App\Models\Image;
-use App\Models\MainCategory;
+use App\Models\Category;
+use App\Models\Option;
 use App\Models\Product;
 use App\Models\ProductBrand;
-use App\Models\SubCategory;
-use App\Models\TopCategory;
+use App\Models\ProductCategory;
 use App\Models\Variant;
+use App\Models\VariantOption;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
@@ -41,30 +42,6 @@ class LoadData extends Command
             $phpArray = json_decode($json, true);
 
             foreach ($phpArray['product'] as $item) {
-//                print_r($item);
-                $main_category = $item['main_category'];
-                $main_category_slug = Str::slug($main_category);
-                MainCategory::insertOrIgnore([
-                    ['name' => $main_category, 'slug' => $main_category_slug],
-                ]);
-                $main_category_id = MainCategory::where('slug', $main_category_slug)->first();
-
-
-                $top_category = $item['top_category'];
-                if (isset($top_category) and !is_array($top_category)) {
-                    TopCategory::insertOrIgnore([
-                        ['main_category_id' => $main_category_id->id, 'name' => $top_category, 'slug' => Str::slug($top_category)],
-                    ]);
-                    $top_category_id = TopCategory::where('name', $top_category)->first();
-
-                    $sub_category = $item['sub_category'];
-                    if (isset($sub_category) and !is_array($sub_category)) {
-                        SubCategory::insertOrIgnore([
-                            ['top_category_id' => $top_category_id->id, 'name' => $sub_category, 'slug' => Str::slug($sub_category)],
-                        ]);
-                        $sub_category_id = SubCategory::where('name', $sub_category)->first();
-                    }
-                }
 
                 $product_brand = $item['brand'];
                 ProductBrand::insertOrIgnore([
@@ -74,10 +51,7 @@ class LoadData extends Command
 
                 Product::insertOrIgnore([
                     'product_code' => $item['productCode'],
-                    'barcode' => !is_array($item['barcode'])?$item['barcode']:null,
-                    'main_category_id' => $main_category_id->id,
-                    'top_category_id' => $top_category_id->id??null,
-                    'sub_category_id' => $sub_category_id->id??null,
+                    'barcode' => !is_array($item['barcode']) ? $item['barcode'] : null,
                     'active' => $item['active'],
                     'product_brand_id' => $product_brand_id,
                     'name' => $item['name'],
@@ -88,44 +62,125 @@ class LoadData extends Command
                     'currency' => $item['currency'],
                     'quantity' => $item['quantity'],
                     'in_discount' => $item['in_discount'],
-                    'detail' => is_array($item['detail'])?join('', $item['detail']):$item['detail'],
+                    'detail' => !is_array($item['detail']) ? $item['detail'] : null,
                 ]);
-                $product_id = Product::where('product_code', $item['productCode'])->first()??null;
+                $product_id = Product::where('product_code', $item['productCode'])->value('id');
 
-                for ($i=1; $i<10; $i++) {
-                    if (isset($item['image'.$i])) {
-                        $link = $item['image'.$i];
+
+                $main_category = $item['main_category'];
+                $main_category_slug = Str::slug($main_category);
+                Category::insertOrIgnore([
+                    ['name' => $main_category, 'slug' => $main_category_slug],
+                ]);
+                $main_category_id = Category::where('slug', $main_category_slug)->value('id');
+
+                $this->productCategory($product_id, $main_category_id);
+
+                $top_category = $item['top_category'];
+                if (isset($top_category) and !is_array($top_category)) {
+                    Category::insertOrIgnore([
+                        ['parent_id' => $main_category_id, 'name' => $top_category, 'slug' => Str::slug($top_category)],
+                    ]);
+                    $top_category_id = Category::where('slug', Str::slug($top_category))->value('id')??null;
+
+                    $this->productCategory($product_id, $top_category_id);
+
+                    $sub_category = $item['sub_category'];
+                    if (isset($sub_category) and !is_array($sub_category)) {
+                        Category::insertOrIgnore([
+                            ['parent_id' => $top_category_id, 'name' => $sub_category, 'slug' => Str::slug($sub_category)],
+                        ]);
+                        $sub_category_id = Category::where('slug', Str::slug($sub_category))->value('id')??null;
+
+                        $this->productCategory($product_id, $sub_category_id);
+                    }
+                }
+
+                for ($i = 1; $i < 10; $i++) {
+                    if (isset($item['image' . $i])) {
+                        $link = $item['image' . $i];
                         Image::insertOrIgnore([
-                            ['product_id' => $product_id->id, 'link' => $link],
+                            ['product_id' => $product_id, 'link' => $link],
                         ]);
                     } else break;
                 }
 
-                if  (array_key_exists('variants', $item))
-                foreach ($item['variants']['variant'] as $variant) {
-//                    print_r($variant);
-                    if (is_array($variant) and !empty($variant))
-                    Variant::insertOrIgnore([
-                            'product_id' => $product_id->id,
-                            'name1' => $variant['name1'],
-                            'value1' => $variant['value1'],
-                            'name2' => !is_array($variant['name2'])?$variant['name2']:null,
-                            'value2' => !is_array($variant['value2'])?$variant['value2']:null,
-                            'quantity' => $variant['quantity'],
-                            'barcode' => !is_array($variant['barcode']) ? $variant['barcode'] : null,
-                    ]);
+                if (array_key_exists('variants', $item)) {
+                    foreach ($item['variants']['variant'] as $variant) {
+                        if (is_array($variant) and !empty($variant)) {
+                            $variant_id = Variant::insertGetId([
+                                'product_id' => $product_id,
+                                'quantity' => $variant['quantity'],
+                                'barcode' => !is_array($variant['barcode']) ? $variant['barcode'] : null,
+                            ]);
+                            $this->variantOption($variant_id, $variant['name1'], $variant['value1']);
+
+                            if (!is_array($variant['name2']) and !is_array($variant['value2'])) {
+                                $this->variantOption($variant_id, $variant['name2'], $variant['value2']);
+                            }
+                        }
+                    }
                 }
-
             }
-
-//            print_r(MainCategory::where('name', $phpArray['product'][0]['main_category'])->first()->value('id'));
-//            print_r($phpArray['product'][0]['variants']['variant'][0]);
-//            foreach ($phpArray['product'] as $item) {
-//                if(is_array($item['detail'])){
-//                    echo $item['productCode'].' --- ';
-//                }
-//            }
-//            print_r($phpArray['product'][200]['detail']);
         });
+    }
+
+    /**
+     * Adding or ignoring new data to ProductCategory
+     *
+     * @param int $product_id
+     * @param int $category_id
+     * @return array|bool|string|void|null
+     */
+    private function productCategory(int $product_id, int $category_id)
+    {
+        ProductCategory::insertOrIgnore([
+            'product_id' => $product_id,
+            'category_id' => $category_id
+        ]);
+    }
+
+    /**
+     * Adding or ignoring new data to Option
+     *
+     * @param string $name
+     * @param string $value
+     * @return array|bool|string|void|null
+     */
+    private function createOption(string $name, string $value)
+    {
+        Option::insertOrIgnore([
+            'name' => $name,
+            'value' => $value
+        ]);
+    }
+
+    /**
+     * Get id from Option by $value
+     *
+     * @param string $value
+     * @return mixed
+     */
+    private function getOptionId(string $value)
+    {
+        return Option::where('value', $value)->first()->value('id');
+    }
+
+    /**
+     * Insert Option and VariantOption
+     *
+     * @param int $variant_id
+     * @param string $name
+     * @param string $value
+     * @return void
+     */
+    private function variantOption(int $variant_id, string $name, string $value)
+    {
+        $this->createOption($name, $value);
+        $option_id = $this->getOptionId($value);
+        VariantOption::insertOrIgnore([
+            'variant_id' => $variant_id,
+            'option_id' => $option_id
+        ]);
     }
 }

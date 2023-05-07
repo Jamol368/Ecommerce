@@ -18,7 +18,7 @@ use Illuminate\Support\Facades\Route;
 Route::get('/', [ProductController::class, 'index'])->name('home');
 Route::get('/product/view/{id}', [ProductController::class, 'view'])->name('product-view');
 Route::get('/category/view/{id}', [ProductController::class, 'category'])->name('category-view');
-Route::get('/search', [ProductController::class, 'search'])->name('search');
+Route::post('/search', [ProductController::class, 'search'])->name('search');
 
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');

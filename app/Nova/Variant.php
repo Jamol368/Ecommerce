@@ -4,8 +4,10 @@ namespace App\Nova;
 
 use Illuminate\Http\Request;
 use Laravel\Nova\Fields\BelongsTo;
+use Laravel\Nova\Fields\BelongsToMany;
 use Laravel\Nova\Fields\ID;
 use Laravel\Nova\Fields\Number;
+use Laravel\Nova\Fields\Tag;
 use Laravel\Nova\Fields\Text;
 use Laravel\Nova\Http\Requests\NovaRequest;
 
@@ -32,8 +34,7 @@ class Variant extends Resource
      */
     public static $search = [
         'id',
-        'name1',
-        'name2'
+        'barcode'
     ];
 
     /**
@@ -46,13 +47,10 @@ class Variant extends Resource
     {
         return [
             ID::make()->sortable(),
-            Text::make('name1')->maxlength(127),
-            Text::make('value1')->maxlength(127),
-            Text::make('name2')->maxlength(127),
-            Text::make('value2')->maxlength(127),
             Number::make('quantity')->min(0)->step(1),
             Text::make('barcode')->maxlength(127),
-            BelongsTo::make('product')->searchable()
+            BelongsTo::make('product')->searchable(),
+            Tag::make('options')->preload()
         ];
     }
 

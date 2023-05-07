@@ -16,16 +16,27 @@ class Variant extends Model
      */
     protected $fillable = [
         'product_id',
-        'name1',
-        'value1',
-        'name2',
-        'value',
         'quantity',
         'barcode'
     ];
 
+    /**
+     * The product that belongs to the variant.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
     public function product()
     {
         return $this->belongsTo(Product::class);
+    }
+
+    /**
+     * The options that belong to the variant.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
+     */
+    public function options()
+    {
+        return $this->belongsToMany(Option::class, 'variant_options');
     }
 }

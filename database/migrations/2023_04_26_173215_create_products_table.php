@@ -15,9 +15,6 @@ return new class extends Migration
             $table->id();
             $table->string('product_code', 127);
             $table->string('barcode', 127)->nullable();
-            $table->foreignId('main_category_id')->constrained();
-            $table->foreignId('top_category_id')->nullable()->constrained();
-            $table->foreignId('sub_category_id')->nullable()->constrained();
             $table->smallInteger('active')->default(0);
             $table->foreignId('product_brand_id')->nullable()->constrained();
             $table->string('name', 255);
@@ -28,7 +25,7 @@ return new class extends Migration
             $table->string('currency', 7);
             $table->integer('quantity');
             $table->smallInteger('in_discount')->default(0);
-            $table->text('detail');
+            $table->text('detail')->nullable();
             $table->timestamps();
         });
     }

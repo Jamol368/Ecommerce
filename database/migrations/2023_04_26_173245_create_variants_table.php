@@ -14,12 +14,8 @@ return new class extends Migration
         Schema::create('variants', function (Blueprint $table) {
             $table->id();
             $table->foreignId('product_id')->constrained();
-            $table->string('name1', 127);
-            $table->string('value1', 127);
-            $table->string('name2', 127)->nullable();
-            $table->string('value2', 127)->nullable();
             $table->integer('quantity');
-            $table->string('barcode', 127);
+            $table->string('barcode', 127)->nullable();
             $table->timestamps();
         });
     }

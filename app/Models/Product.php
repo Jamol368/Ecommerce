@@ -19,9 +19,6 @@ class Product extends Model
     protected $fillable = [
         'product_code',
         'barcode',
-        'main_category_id',
-        'top_category_id',
-        'sub_category_id',
         'active',
         'product_brand_id',
         'name',
@@ -35,34 +32,43 @@ class Product extends Model
         'detail'
     ];
 
-    public function mainCategory()
+    /**
+     * The categories that belong to the product.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
+     */
+    public function categories()
     {
-        return $this->belongsTo(MainCategory::class);
+        return $this->belongsToMany(Category::class, 'product_categories');
     }
 
-    public function topCategory()
-    {
-        return $this->belongsTo(TopCategory::class);
-    }
-
-    public function subCategory()
-    {
-        return $this->belongsTo(SubCategory::class);
-    }
-
+    /**
+     * The product brands that belong to the product.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
     public function productBrand()
     {
         return $this->belongsTo(ProductBrand::class);
     }
 
+    /**
+     * The variants that belong to the product.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
     public function variants()
     {
         return $this->hasMany(Variant::class);
     }
 
+    /**
+     * The images that belong to the product.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
     public function images()
     {
         return $this->hasMany(Image::class);
     }
-
 }

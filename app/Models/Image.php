@@ -19,6 +19,11 @@ class Image extends Model
         'link'
     ];
 
+    /**
+     * The product that belongs to the image.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
     public function product()
     {
         return $this->belongsTo(Product::class);

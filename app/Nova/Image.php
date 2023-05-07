@@ -44,8 +44,8 @@ class Image extends Resource
     {
         return [
             ID::make()->sortable(),
-            \Laravel\Nova\Fields\Avatar::make('Link'),
-            BelongsTo::make('Product')
+            ImageField::make('Link'),
+            BelongsTo::make('Product')->searchable()
         ];
     }
 
