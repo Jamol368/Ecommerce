@@ -1,5 +1,11 @@
 FROM php:8.2-fpm
 
+# Copy composer.lock and composer.json
+COPY composer.json composer.lock /var/www/html/
+
+# Set working directory
+WORKDIR /var/www/html
+
 # Install system dependencies
 RUN apt-get update && apt-get install -y \
     git \
@@ -7,7 +13,9 @@ RUN apt-get update && apt-get install -y \
     zip \
     unzip \
     curl \
-    zlib1g-dev libicu-dev g++
+    zlib1g-dev \
+    libicu-dev \
+    g++
 
 # Install ext intl
 RUN docker-php-ext-configure intl
@@ -23,3 +31,6 @@ RUN docker-php-ext-install gd
 
 # Get latest Composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
+
+COPY . /var/www/html
+
