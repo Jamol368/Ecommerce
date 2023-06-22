@@ -23,7 +23,7 @@ class Option extends Resource
      */
     public function title()
     {
-        return $this->name.' - '.$this->value;
+        return $this->name;
     }
 
 
@@ -33,8 +33,7 @@ class Option extends Resource
      * @var array
      */
     public static $search = [
-        'name',
-        'value'
+        'id', 'name'
     ];
 
     /**
@@ -47,8 +46,10 @@ class Option extends Resource
     {
         return [
             ID::make()->sortable(),
-            Text::make('name'),
-            Text::make('value'),
+
+            Text::make('name')
+                ->sortable()
+                ->rules('required', 'max:255')
         ];
     }
 

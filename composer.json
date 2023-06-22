@@ -6,6 +6,8 @@
     "license": "MIT",
     "require": {
         "php": "^8.1",
+        "dniccum/phone-number": "^2.2",
+        "gabelbart/nova-geolocation-field": "^0.2.3",
         "guzzlehttp/guzzle": "^7.2",
         "kirschbaum-development/nova-inline-relationship": "^2.0",
         "laravel/framework": "^10.8",

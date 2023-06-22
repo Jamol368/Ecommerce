@@ -2,7 +2,28 @@
 
 namespace App\Providers;
 
+use App\Nova\Category;
+use App\Nova\CategoryStatus;
+use App\Nova\City;
+use App\Nova\Currency;
+use App\Nova\Option;
+use App\Nova\OptionValue;
+use App\Nova\Product;
+use App\Nova\ProductBrand;
+use App\Nova\ProductInstance;
+use App\Nova\ProductOption;
+use App\Nova\ProductStatus;
+use App\Nova\Role;
+use App\Nova\State;
+use App\Nova\Tag;
+use App\Nova\User;
+use App\Nova\Vendor;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
+use Laravel\Nova\Dashboards\Main;
+use Laravel\Nova\Menu\MenuItem;
+use Laravel\Nova\Menu\MenuSection;
+use Laravel\Nova\Menu\MenuGroup;
 use Laravel\Nova\Nova;
 use Laravel\Nova\NovaApplicationServiceProvider;
 
@@ -16,6 +37,55 @@ class NovaServiceProvider extends NovaApplicationServiceProvider
     public function boot()
     {
         parent::boot();
+
+        Nova::booted(function () {
+            app()->setlocale('uz');
+        });
+
+        Nova::mainMenu(function (Request $request) {
+            return [
+                MenuSection::dashboard(Main::class)->icon('chart-bar'),
+
+                MenuSection::make('Users', [
+                    MenuItem::resource(User::class),
+                ])->icon('users')->collapsable(),
+
+                MenuSection::make('Auth', [
+                    MenuItem::resource(Role::class),
+                ])->icon('key')->collapsable(),
+
+                MenuSection::make('Store', [
+                    MenuGroup::make('Product', [
+                        MenuItem::resource(ProductStatus::class),
+                        MenuItem::resource(Product::class),
+                        MenuItem::resource(ProductInstance::class),
+                    ]),
+
+                    MenuGroup::make('Product options', [
+                        MenuItem::resource(Option::class),
+                        MenuItem::resource(OptionValue::class),
+                        MenuItem::resource(ProductOption::class),
+                    ]),
+
+                    MenuGroup::make('Product parameters', [
+                        MenuItem::resource(ProductBrand::class),
+                        MenuItem::resource(Currency::class),
+                        MenuItem::resource(Tag::class),
+                        MenuItem::resource(CategoryStatus::class),
+                        MenuItem::resource(Category::class),
+                    ]),
+                ])->icon('view-boards')->collapsable()->collapsedByDefault(),
+
+                MenuSection::make('Vendors', [
+                    MenuItem::resource(Vendor::class),
+                ])->icon('library')->collapsable()->collapsedByDefault(),
+
+                MenuSection::make('Addresses', [
+                    MenuItem::resource(State::class),
+                    MenuItem::resource(City::class),
+                ])->icon('globe')->collapsable()->collapsedByDefault(),
+            ];
+        });
     }
 
     /**
@@ -23,7 +93,7 @@ class NovaServiceProvider extends NovaApplicationServiceProvider
      *
      * @return void
      */
-    protected function routes()
+    protected function routes(): void
     {
         Nova::routes()
                 ->withAuthenticationRoutes()
@@ -38,12 +108,10 @@ class NovaServiceProvider extends NovaApplicationServiceProvider
      *
      * @return void
      */
-    protected function gate()
+    protected function gate(): void
     {
         Gate::define('viewNova', function ($user) {
-            return in_array($user->email, [
-                '12admin@gmail.com'
-            ]);
+            return $user->hasAnyRole(['admin', 'vendor']);
         });
     }
 
@@ -52,7 +120,7 @@ class NovaServiceProvider extends NovaApplicationServiceProvider
      *
      * @return array
      */
-    protected function dashboards()
+    protected function dashboards(): array
     {
         return [
             new \App\Nova\Dashboards\Main,
@@ -64,7 +132,7 @@ class NovaServiceProvider extends NovaApplicationServiceProvider
      *
      * @return array
      */
-    public function tools()
+    public function tools(): array
     {
         return [];
     }
@@ -74,7 +142,7 @@ class NovaServiceProvider extends NovaApplicationServiceProvider
      *
      * @return void
      */
-    public function register()
+    public function register(): void
     {
         //
     }

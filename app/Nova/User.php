@@ -4,11 +4,13 @@ namespace App\Nova;
 
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rules;
+use Laravel\Nova\Fields\BelongsTo;
 use Laravel\Nova\Fields\Gravatar;
 use Laravel\Nova\Fields\ID;
 use Laravel\Nova\Fields\Password;
 use Laravel\Nova\Fields\Text;
 use Laravel\Nova\Http\Requests\NovaRequest;
+use Dniccum\PhoneNumber\PhoneNumber;
 
 class User extends Resource
 {
@@ -52,6 +54,16 @@ class User extends Resource
                 ->sortable()
                 ->rules('required', 'max:255'),
 
+            PhoneNumber::make('Phone')
+                ->country('UZ')
+                ->useMaskPlaceholder()
+                ->format('+998-(##)-###-##-##')
+                ->linkOnDetail()
+                ->disableValidation()
+                ->rules('required')
+                ->creationRules('unique:users,phone')
+                ->updateRules('unique:users,phone,{{resourceId}}'),
+
             Text::make('Email')
                 ->sortable()
                 ->rules('required', 'email', 'max:254')
@@ -62,6 +74,8 @@ class User extends Resource
                 ->onlyOnForms()
                 ->creationRules('required', Rules\Password::defaults())
                 ->updateRules('nullable', Rules\Password::defaults()),
+
+            BelongsTo::make('Role')
         ];
     }
 

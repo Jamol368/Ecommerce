@@ -15,9 +15,12 @@ class ProductController extends Controller
      */
     public function index()
     {
-        $main_category = Category::where('parent_id', null)->take(5)->get();
-        $products = Product::take(8)->get();
-        return view('welcome', ['data' => $main_category, 'products' => $products]);
+//        $user = \App\Models\User::find(1)->get();
+//        $user::with('vendors:user_id');
+        return view('welcome', ['model' => 'user']);
+//        $main_category = Category::where('parent_id', null)->take(5)->get();
+//        $products = Product::take(8)->get();
+//        return view('welcome', ['data' => $main_category, 'products' => $products]);
     }
 
     /**

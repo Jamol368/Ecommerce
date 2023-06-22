@@ -43,7 +43,12 @@ class ProductBrand extends Resource
     {
         return [
             ID::make()->sortable(),
-            Text::make('Name')->rules('required', 'unique:product_brands,name'),
+
+            Text::make('Name')
+                ->rules('required')
+                ->creationRules('unique:product_brands,name')
+                ->updateRules('unique:product_brands,name,{{resourceId}}'),
+
             Slug::make('Slug')->from('name')
         ];
     }

@@ -44,8 +44,11 @@ class Image extends Resource
     {
         return [
             ID::make()->sortable(),
-            ImageField::make('Link'),
-            BelongsTo::make('Product')->searchable()
+
+            BelongsTo::make('Product')
+                ->searchable(),
+
+            ImageField::make('Image')
         ];
     }
 

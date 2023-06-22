@@ -5,10 +5,13 @@ namespace App\Nova;
 use Illuminate\Http\Request;
 use Laravel\Nova\Fields\BelongsTo;
 use Laravel\Nova\Fields\BelongsToMany;
+use Laravel\Nova\Fields\HasMany;
 use Laravel\Nova\Fields\ID;
+use Laravel\Nova\Fields\Number;
 use Laravel\Nova\Fields\Slug;
 use Laravel\Nova\Fields\Tag;
 use Laravel\Nova\Fields\Text;
+use Laravel\Nova\Fields\Image;
 use Laravel\Nova\Http\Requests\NovaRequest;
 
 class Category extends Resource
@@ -46,9 +49,20 @@ class Category extends Resource
     {
         return [
             ID::make()->sortable(),
-            BelongsTo::make('Parent', 'parent', $this),
+            BelongsTo::make('Parent', 'parent', $this)->nullable(),
             Text::make('name')->maxlength(127),
             Slug::make('slug')->from('name')
+                ->hideFromIndex(),
+            Number::make('order'),
+            BelongsTo::make('category_status', 'categoryStatus'),
+            Image::make('image')
+                ->maxWidth(400)
+                ->prunable()
+                ->rules('mimes:png,webp')
+                ->creationRules('required')
+                ->deletable(false)
+                ->hideFromIndex(),
+            HasMany::make('category', 'children', $this)
         ];
     }
 

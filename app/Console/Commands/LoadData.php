@@ -7,7 +7,7 @@ use App\Models\Category;
 use App\Models\Option;
 use App\Models\Product;
 use App\Models\ProductBrand;
-use App\Models\ProductCategory;
+use App\Models\ProductTag;
 use App\Models\Variant;
 use App\Models\VariantOption;
 use Illuminate\Console\Command;
@@ -134,7 +134,7 @@ class LoadData extends Command
      */
     private function productCategory(int $product_id, int $category_id)
     {
-        ProductCategory::insertOrIgnore([
+        ProductTag::insertOrIgnore([
             'product_id' => $product_id,
             'category_id' => $category_id
         ]);

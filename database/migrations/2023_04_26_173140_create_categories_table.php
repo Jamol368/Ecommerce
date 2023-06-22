@@ -14,9 +14,13 @@ return new class extends Migration
         Schema::create('categories', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('parent_id')->nullable();
-            $table->string('name', 127)->unique()->index();
-            $table->string('slug', 127)->unique();
+            $table->string('name')->unique()->index();
+            $table->string('slug')->unique()->index();
+            $table->integer('order')->nullable();
+            $table->foreignId('category_status_id')->constrained();
+            $table->string('image');
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 
@@ -25,6 +29,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('main_categories');
+        Schema::dropIfExists('categories');
     }
 };

@@ -11,6 +11,7 @@ use Laravel\Nova\Fields\HasMany;
 use Laravel\Nova\Fields\ID;
 use Laravel\Nova\Fields\Number;
 use Laravel\Nova\Fields\Select;
+use Laravel\Nova\Fields\Slug;
 use Laravel\Nova\Fields\Tag;
 use Laravel\Nova\Fields\Text;
 use Laravel\Nova\Fields\Trix;
@@ -51,22 +52,70 @@ class Product extends Resource
     {
         return [
             ID::make()->sortable(),
-            Text::make('Product code')->maxlength(127),
-            Text::make('Barcode'),
-            Tag::make('categories')->searchable(true)->displayAsList()->preload(),
-            Boolean::make('Active'),
-            BelongsTo::make('Product brand')->searchable(),
-            Text::make('Name')->maxlength(255),
-            Text::make('Description')->maxlength(255),
-            Currency::make('List price')->locale('en'),
-            Currency::make('Price')->locale('en'),
-            Number::make('tax')->min(0)->max(1)->step(0.01),
-            Text::make('Currency')->maxlength(7),
-            Number::make('Quantity')->min(0)->step(1),
-            Boolean::make('In discount'),
-            Trix::make('Detail')->hideFromIndex(),
-            HasMany::make('images')->inline(),
-            HasMany::make('variants')->inline()
+
+            BelongsTo::make('Vendor')
+                ->searchable(),
+
+            BelongsTo::make('Category')
+                ->searchable(),
+
+            BelongsTo::make('Product brand')
+                ->searchable(),
+
+            Text::make('Model')
+                ->rules('required', 'max:31'),
+
+            Text::make('Name')
+                ->rules('required', 'max:255'),
+
+            Slug::make('Slug')
+                ->hideFromIndex()
+                ->rules('required', 'max:255')
+                ->from('name'),
+
+            Text::make('Product code')
+                ->hideFromIndex()
+                ->rules('required', 'max:255'),
+
+            Text::make('Description')
+                ->hideFromIndex()
+                ->rules('required', 'max:255'),
+
+            Trix::make('Detail')
+                ->hideFromIndex()
+                ->rules('required')
+                ->hideFromIndex(),
+
+            Number::make('tax')
+                ->hideFromIndex()
+                ->required()
+                ->default(0)
+                ->min(0)
+                ->max(1)
+                ->step(0.01),
+
+            BelongsTo::make('Currency')
+                ->hideFromIndex(),
+
+            Number::make('Discount')
+                ->hideFromIndex()
+                ->default(0)
+                ->step(1),
+
+            BelongsTo::make('Product status')
+                ->searchable(),
+
+            BelongsToMany::make('Tags')
+                ->hideFromIndex()
+                ->searchable()
+                ->showCreateRelationButton()
+                ->modalSize('7xl'),
+
+            HasMany::make('Images')
+                ->hideFromIndex(),
+
+            HasMany::make('Product Instance', 'productInstances')
+                ->hideFromIndex(),
         ];
     }
 
@@ -112,5 +161,21 @@ class Product extends Resource
     public function actions(NovaRequest $request)
     {
         return [];
+    }
+
+    /**
+     * Build an "index" query for the given resource.
+     *
+     * @param  \Laravel\Nova\Http\Requests\NovaRequest  $request
+     * @param  \Illuminate\Database\Eloquent\Builder  $query
+     * @return \Illuminate\Database\Eloquent\Builder
+     */
+    public static function indexQuery(NovaRequest $request, $query)
+    {
+        if ($request->user()->hasRole('vendor')) {
+            $query = parent::indexQuery($request, $query);
+            return $query->whereIn('vendor_id',  $request->user()->vendors()->get('id'));
+        }
+        return $query;
     }
 }

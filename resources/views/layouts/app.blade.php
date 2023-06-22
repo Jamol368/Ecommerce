@@ -75,9 +75,6 @@
                             <ul>
                                 <li class="active"><a href="{{ route('home') }}">Home</a></li>
 
-                                @foreach($contents as $content)
-                                <li><a href="{{ route('category-view', ['id' => $content->id]) }}">{{ $content->name }}</a></li>
-                                @endforeach
                             </ul>
                         </nav>
                     </div>
@@ -194,33 +191,7 @@
                         </div>
                     </div>
                 </div>
-                <div class="row property__gallery">
-                    @foreach($new_products as $product)
-                        <div class="col-lg-3 col-md-4 col-sm-6 mix">
-                            <div class="product__item">
-                                <div class="product__item__pic set-bg" data-setbg="{{ $product->images[0]->link }}">
-                                    <div class="label new">New</div>
-                                    <ul class="product__hover">
-                                        <li><a href="{{ $product->images[0]->link }}" class="image-popup"><span class="arrow_expand"></span></a></li>
-                                        <li><a href="#"><span class="icon_heart_alt"></span></a></li>
-                                        <li><a href="#"><span class="icon_bag_alt"></span></a></li>
-                                    </ul>
-                                </div>
-                                <div class="product__item__text">
-                                    <h6><a href="{{ route('product-view', ['id' => $product->id]) }}">{{ $product->name }}</a></h6>
-                                    <div class="rating">
-                                        <i class="fa fa-star"></i>
-                                        <i class="fa fa-star"></i>
-                                        <i class="fa fa-star"></i>
-                                        <i class="fa fa-star"></i>
-                                        <i class="fa fa-star"></i>
-                                    </div>
-                                    <div class="product__price">{{ $product->currency.': '.$product->price }}</div>
-                                </div>
-                            </div>
-                        </div>
-                    @endforeach
-                </div>
+                <div class="row property__gallery"></div>
             </div>
         </section>
         <!-- Product Section End -->
