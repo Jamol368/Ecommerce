@@ -3,20 +3,18 @@
 namespace App\Nova;
 
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use Laravel\Nova\Fields\ID;
-use Laravel\Nova\Fields\Slug;
 use Laravel\Nova\Fields\Text;
 use Laravel\Nova\Http\Requests\NovaRequest;
 
-class ProductBrand extends Resource
+class CategoryStatus extends Resource
 {
     /**
      * The model the resource corresponds to.
      *
-     * @var class-string<\App\Models\ProductBrand>
+     * @var class-string<\App\Models\CategoryStatus>
      */
-    public static $model = \App\Models\ProductBrand::class;
+    public static $model = \App\Models\CategoryStatus::class;
 
     /**
      * The single value that should be used to represent the resource when being displayed.
@@ -31,7 +29,7 @@ class ProductBrand extends Resource
      * @var array
      */
     public static $search = [
-        'name'
+        'id', 'name'
     ];
 
     /**
@@ -44,13 +42,7 @@ class ProductBrand extends Resource
     {
         return [
             ID::make()->sortable(),
-
-            Text::make('Name')
-                ->rules('required')
-                ->creationRules('unique:product_brands,name')
-                ->updateRules('unique:product_brands,name,{{resourceId}}'),
-
-            Slug::make('Slug')->from('name')
+            Text::make('name')
         ];
     }
 
@@ -96,10 +88,5 @@ class ProductBrand extends Resource
     public function actions(NovaRequest $request)
     {
         return [];
-    }
-
-    public static function softDeletes()
-    {
-        return Auth::user()->hasRole('admin');
     }
 }

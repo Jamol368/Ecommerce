@@ -5,18 +5,17 @@ namespace App\Nova;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Laravel\Nova\Fields\ID;
-use Laravel\Nova\Fields\Slug;
 use Laravel\Nova\Fields\Text;
 use Laravel\Nova\Http\Requests\NovaRequest;
 
-class ProductBrand extends Resource
+class Currency extends Resource
 {
     /**
      * The model the resource corresponds to.
      *
-     * @var class-string<\App\Models\ProductBrand>
+     * @var class-string<\App\Models\Currency>
      */
-    public static $model = \App\Models\ProductBrand::class;
+    public static $model = \App\Models\Currency::class;
 
     /**
      * The single value that should be used to represent the resource when being displayed.
@@ -31,7 +30,7 @@ class ProductBrand extends Resource
      * @var array
      */
     public static $search = [
-        'name'
+        'id', 'name'
     ];
 
     /**
@@ -44,13 +43,8 @@ class ProductBrand extends Resource
     {
         return [
             ID::make()->sortable(),
-
-            Text::make('Name')
-                ->rules('required')
-                ->creationRules('unique:product_brands,name')
-                ->updateRules('unique:product_brands,name,{{resourceId}}'),
-
-            Slug::make('Slug')->from('name')
+            Text::make('name')->maxlength(255),
+            Text::make('icon')->maxlength(255),
         ];
     }
 

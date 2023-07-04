@@ -18,12 +18,12 @@ class UserFactory extends Factory
     public function definition(): array
     {
         return [
-            'name' => 'admin',
-            'phone' => '991112233',
-            'email' => 'admin@gmail.com',
+            'name' => fake()->userName,
+            'phone' => fake()->phoneNumber,
+            'email' => fake()->unique()->email,
             'email_verified_at' => now(),
-            'password' => bcrypt('admin'),
-            'role_id' => 1,
+            'password' => bcrypt('password'),
+            'role_id' => fake()->numberBetween(2, 3),
             'remember_token' => Str::random(10),
         ];
     }

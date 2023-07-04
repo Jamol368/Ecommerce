@@ -3,27 +3,25 @@
 namespace App\Nova;
 
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
+use Laravel\Nova\Fields\BelongsTo;
 use Laravel\Nova\Fields\ID;
-use Laravel\Nova\Fields\Slug;
-use Laravel\Nova\Fields\Text;
 use Laravel\Nova\Http\Requests\NovaRequest;
 
-class ProductBrand extends Resource
+class ProductOption extends Resource
 {
     /**
      * The model the resource corresponds to.
      *
-     * @var class-string<\App\Models\ProductBrand>
+     * @var class-string<\App\Models\ProductOption>
      */
-    public static $model = \App\Models\ProductBrand::class;
+    public static $model = \App\Models\ProductOption::class;
 
     /**
      * The single value that should be used to represent the resource when being displayed.
      *
      * @var string
      */
-    public static $title = 'name';
+    public static $title = 'id';
 
     /**
      * The columns that should be searched.
@@ -31,7 +29,7 @@ class ProductBrand extends Resource
      * @var array
      */
     public static $search = [
-        'name'
+        'id',
     ];
 
     /**
@@ -45,12 +43,9 @@ class ProductBrand extends Resource
         return [
             ID::make()->sortable(),
 
-            Text::make('Name')
-                ->rules('required')
-                ->creationRules('unique:product_brands,name')
-                ->updateRules('unique:product_brands,name,{{resourceId}}'),
+            BelongsTo::make('Product Instance'),
 
-            Slug::make('Slug')->from('name')
+            BelongsTo::make('Option Value'),
         ];
     }
 
@@ -98,8 +93,21 @@ class ProductBrand extends Resource
         return [];
     }
 
-    public static function softDeletes()
+    /**
+     * Build an "index" query for the given resource.
+     *
+     * @param  \Laravel\Nova\Http\Requests\NovaRequest  $request
+     * @param  \Illuminate\Database\Eloquent\Builder  $query
+     * @return \Illuminate\Database\Eloquent\Builder
+     */
+    public static function indexQuery(NovaRequest $request, $query)
     {
-        return Auth::user()->hasRole('admin');
+        if ($request->user()->hasRole('vendor')) {
+            return $query->leftJoin('product_instances', 'product_instance_id', '=', 'product_instances.id')
+                ->leftJoin('products', 'product_instances.product_id', '=', 'products.id')
+                ->leftJoin('vendors', 'products.vendor_id', '=', 'vendors.id')
+                ->where('vendors.user_id', '=', $request->user()->id);
+        }
+        return $query;
     }
 }
