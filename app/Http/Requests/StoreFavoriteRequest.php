@@ -11,7 +11,7 @@ class StoreFavoriteRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return false;
+        return true;
     }
 
     /**
@@ -22,7 +22,9 @@ class StoreFavoriteRequest extends FormRequest
     public function rules(): array
     {
         return [
-            //
+            'user_id' => 'required|integer',
+            'vendor_id' => 'required|integer',
+            'product_id' => 'required|integer',
         ];
     }
 }

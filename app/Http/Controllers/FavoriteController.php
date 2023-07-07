@@ -13,7 +13,7 @@ class FavoriteController extends Controller
      */
     public function index()
     {
-        //
+        return response()->json(Favorite::all());
     }
 
     /**
@@ -29,7 +29,8 @@ class FavoriteController extends Controller
      */
     public function store(StoreFavoriteRequest $request)
     {
-        //
+        $model = new Favorite($request->toArray());
+        return response()->json($model->save());
     }
 
     /**
@@ -37,7 +38,7 @@ class FavoriteController extends Controller
      */
     public function show(Favorite $favorite)
     {
-        //
+        return response()->json($favorite);
     }
 
     /**
@@ -53,7 +54,7 @@ class FavoriteController extends Controller
      */
     public function update(UpdateFavoriteRequest $request, Favorite $favorite)
     {
-        //
+        return $favorite->fill($request->toArray())->isDirty() && $favorite->update();
     }
 
     /**
@@ -61,6 +62,6 @@ class FavoriteController extends Controller
      */
     public function destroy(Favorite $favorite)
     {
-        //
+        return response()->json($favorite->delete());
     }
 }
