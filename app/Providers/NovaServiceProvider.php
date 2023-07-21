@@ -2,6 +2,7 @@
 
 namespace App\Providers;
 
+use App\Nova\CreditCard;
 use App\Nova\Category;
 use App\Nova\CategoryStatus;
 use App\Nova\City;
@@ -48,6 +49,7 @@ class NovaServiceProvider extends NovaApplicationServiceProvider
 
                 MenuSection::make('Users', [
                     MenuItem::resource(User::class),
+                    MenuItem::resource(CreditCard::class),
                 ])->icon('users')->collapsable(),
 
                 MenuSection::make('Auth', [

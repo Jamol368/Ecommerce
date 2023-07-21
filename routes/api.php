@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\FavoriteController;
+use App\Http\Controllers\CreditCardController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -20,4 +21,6 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 });
 
 Route::resource('favorites', FavoriteController::class)
+    ->except(['edit', 'create']);
+Route::resource('credit-cards', CreditCardController::class)
     ->except(['edit', 'create']);

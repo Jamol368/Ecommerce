@@ -63,6 +63,14 @@ class User extends Authenticatable
     }
 
     /**
+     * Get the credit-cards for the user.
+     */
+    public function creditCards(): HasMany
+    {
+        return $this->hasMany(CreditCard::class)->orderBy('main', 'desc');
+    }
+
+    /**
      * Check if the user's role is one of the listed roles.
      */
     public function hasRole(string $role): bool

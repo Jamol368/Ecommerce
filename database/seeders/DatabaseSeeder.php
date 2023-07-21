@@ -27,10 +27,11 @@ class DatabaseSeeder extends Seeder
 //             UserSeeder::class,
 //             VendorSeeder::class,
 //             ProductInstanceSeeder::class,
-             ImageSeeder::class,
+//             ImageSeeder::class,
 //             ProductTagSeeder::class,
 //             ProductOptionSeeder::class,
 //             FavoriteSeeder::class,
+            CreditCardSeeder::class
          ]);
     }
 }

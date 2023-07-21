@@ -98,4 +98,20 @@ class Product extends Model
     {
         return $this->belongsTo(Category::class);
     }
+
+    /**
+     * Scope a query to only include popular users.
+     */
+    public function scopePopular(Builder $query): void
+    {
+        $query->where('votes', '>', 100);
+    }
+
+    /**
+     * Scope a query to only include active users.
+     */
+    public function scopeActive(Builder $query): void
+    {
+        $query->where('active', 1);
+    }
 }
